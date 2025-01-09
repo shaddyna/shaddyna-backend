@@ -3,7 +3,7 @@ const { getAllUsers, getUserById, editUser } = require('../controllers/userContr
 const router = express.Router();
 
 // Route to get all users
-router.get('/users', getAllUsers);
+router.get('/all', getAllUsers);
 
 // Route to get a single user by ID
 router.get('/:id', getUserById);

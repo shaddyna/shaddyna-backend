@@ -7,6 +7,7 @@ const sellerRoutes = require('./routes/sellerRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const shopRoutes = require("./routes/shopRoutes");
 const productRoutes = require("./routes/productRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
 const connectDB = require('./config/db');
 
 // Load environment variables
@@ -36,6 +37,7 @@ app.use('/api/sellers', sellerRoutes); // Seller routes
 app.use('/api/orders', orderRoutes);
 app.use("/api/shops", shopRoutes);
 app.use("/api/products", productRoutes);
+app.use('/api/categories', categoryRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
