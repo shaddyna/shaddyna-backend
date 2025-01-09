@@ -7,7 +7,7 @@ exports.getAllProducts = async (req, res) => {
     console.log("Fetching all products...");
 
     try {
-        const products = await productModel.find();
+        const products = await Product.find();
         console.log("Fetched products:", products);
         res.status(200).json({ products });
     } catch (error) {
