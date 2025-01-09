@@ -28,7 +28,7 @@ exports.editProduct = async (req, res) => {
 
     try {
         // Find and update the product
-        const updatedProduct = await productModel.findByIdAndUpdate(
+        const updatedProduct = await Product.findByIdAndUpdate(
             productId,
             { name, price: parseFloat(price), description },
             { new: true } // Return the updated product
@@ -53,7 +53,7 @@ exports.deleteProduct = async (req, res) => {
 
     try {
         // Find and delete the product
-        const deletedProduct = await productModel.findByIdAndDelete(productId);
+        const deletedProduct = await Product.findByIdAndDelete(productId);
 
         if (!deletedProduct) {
             return res.status(404).json({ error: "Product not found" });
