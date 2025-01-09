@@ -19,7 +19,7 @@ const app = express();
 app.use(express.json());
 
 // Configure CORS
-const allowedOrigins = ['http://localhost:3000', 'https://shaddyna-frontend.onrender.com']; // Add your frontend URL here
+const allowedOrigins = ['http://localhost:3000', 'https://www.shaddyna.com','https://shaddyna-frontend.onrender.com']; // Add your frontend URL here
 app.use(
   cors({
     origin: allowedOrigins,
