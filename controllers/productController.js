@@ -130,7 +130,7 @@ exports.getProductById = async (req, res) => {
     }
 };
 
-exports.getProductsByCategory = async (req, res) => {
+/*exports.getProductsByCategory = async (req, res) => {
     const { categoryId } = req.query;
   
     try {
@@ -156,4 +156,33 @@ exports.getProductsByCategory = async (req, res) => {
       console.error('Error fetching products by category:', error);
       res.status(500).json({ error: 'Server error. Please try again later.' });
     }
+  };*/
+
+  exports.getProductsByCategory = async (req, res) => {
+    const { categoryId } = req.query;
+  
+    try {
+      // Validate the categoryId
+      if (!categoryId) {
+        return res.status(400).json({ error: 'Category ID is required.' });
+      }
+  
+      // Convert categoryId to ObjectId
+      const objectIdCategoryId = new mongoose.Types.ObjectId(categoryId); // Use `new` here
+  
+      // Fetch products from the database
+      const products = await Product.find({ categoryId: objectIdCategoryId });
+  
+      // If no products are found, return a 404 response
+      if (products.length === 0) {
+        return res.status(404).json({ message: 'No products found for this category.' });
+      }
+  
+      // Respond with the fetched products
+      res.status(200).json(products);
+    } catch (error) {
+      console.error('Error fetching products by category:', error);
+      res.status(500).json({ error: 'Server error. Please try again later.' });
+    }
   };
+  
