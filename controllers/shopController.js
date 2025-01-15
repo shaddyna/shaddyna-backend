@@ -1,5 +1,6 @@
 const Shop = require("../models/Shop");
 const mongoose = require('mongoose'); 
+const cloudinary = require("cloudinary").v2;
 
 // Fetch all shops
 exports.getAllShops = async (req, res) => {
@@ -43,7 +44,7 @@ exports.getShopById = async (req, res) => {
     }
   };
 
-exports.createShop = async (req, res) => {
+/*exports.createShop = async (req, res) => {
   const { name, location, description, email, contact, instagram, facebook, twitter, sellerId } = req.body;
 
   try {
@@ -65,5 +66,50 @@ exports.createShop = async (req, res) => {
     console.error("Error creating shop:", error);
     res.status(500).json({ message: "Internal server error", error });
   }
-};
+};*/
 
+// Backend: Controller
+
+
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
+
+
+exports.createShop = async (req, res) => {
+  const { name, location, description, email, contact, instagram, facebook, twitter, sellerId } = req.body;
+
+  console.log("Incoming request body:", req.body);
+  console.log("Incoming file:", req.file);
+
+  try {
+    let imageUrl = "";
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path);
+      imageUrl = result.secure_url;
+    }
+
+    const newShop = new Shop({
+      name,
+      location,
+      description,
+      email,
+      contact,
+      instagram,
+      facebook,
+      twitter,
+      sellerId,
+      image: imageUrl,
+    });
+
+    await newShop.save();
+    res.status(201).json({ message: "Shop created successfully", shop: newShop });
+  } catch (error) {
+    console.error("Error creating shop:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};

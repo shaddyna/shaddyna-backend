@@ -1,6 +1,17 @@
-const Product = require('../models/Product');
-const Category = require('../models/Category');
-const mongoose = require('mongoose'); 
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const Product = require("../models/Product");
+const Category = require("../models/Category");
+const { Types } = require("mongoose");
+
+// Set up multer for handling file uploads
+const upload = multer({ dest: "uploads/" }).array("images");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 
 // Get all products
 exports.getAllProducts = async (req, res) => {
@@ -66,7 +77,71 @@ exports.deleteProduct = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 exports.addProduct = async (req, res) => {
+    console.log("Starting to process product addition...");
+    console.log("Received request with body:", req.body);
+    console.log("Received files:", req.files);
+  
+    // Validate fields from body
+    const { name, price, description, categoryId } = req.body;
+  
+    // Check for missing required fields
+    if (!name || !price || !description || !categoryId || !req.files || req.files.length === 0) {
+      console.log("Missing required fields");
+      if (!name) console.log("Missing product name");
+      if (!price) console.log("Missing product price");
+      if (!description) console.log("Missing product description");
+      if (!categoryId) console.log("Missing product categoryId");
+      if (!req.files) console.log("Missing file uploads");
+      if (req.files && req.files.length === 0) console.log("Missing product images");
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+  
+    try {
+      // Validate categoryId
+      if (!Types.ObjectId.isValid(categoryId)) {
+        console.log("Invalid categoryId format");
+        return res.status(400).json({ error: "Invalid categoryId" });
+      }
+  
+      const category = await Category.findById(categoryId);
+      if (!category) {
+        console.log("Category not found");
+        return res.status(404).json({ error: "Category not found" });
+      }
+  
+      // Upload images to Cloudinary
+      const imageUrls = await Promise.all(
+        req.files.map(async (file) => {
+          console.log("Uploading image to Cloudinary:", file.originalname);
+          const uploadedImage = await cloudinary.uploader.upload(file.path, {
+            folder: "products", // Folder on Cloudinary where the images will be stored
+          });
+          console.log("Uploaded image URL:", uploadedImage.secure_url);
+          return uploadedImage.secure_url;
+        })
+      );
+  
+      // Create product in the database
+      const product = await Product.create({
+        name,
+        price: parseFloat(price),
+        description,
+        categoryId,
+        images: imageUrls,
+      });
+  
+      console.log("Product created successfully", product);
+      res.status(201).json({ message: "Created successfully", product });
+    } catch (error) {
+      console.error("Error during product creation:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+  
+  
+/*exports.addProduct = async (req, res) => {
     console.log("Starting to process product addition...");
 
     const { name, price, description, categoryId } = req.body;
@@ -108,7 +183,7 @@ exports.addProduct = async (req, res) => {
         console.error("Error during product creation:", error);
         res.status(500).json({ error: error.message });
     }
-};
+};*/
 
 // Fetch a single product by its ID
 exports.getProductById = async (req, res) => {
