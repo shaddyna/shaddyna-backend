@@ -80,10 +80,14 @@ cloudinary.config({
 
 
 exports.createShop = async (req, res) => {
-  const { name, location, description, email, contact, instagram, facebook, twitter, sellerId } = req.body;
-
   console.log("Incoming request body:", req.body);
-  console.log("Incoming file:", req.file);
+  console.log("Incoming file:", req.file); // Logs the file object from multer
+
+  if (!req.file) {
+    console.log("No file uploaded");
+  }
+
+  const { name, location, description, email, contact, instagram, facebook, twitter, sellerId } = req.body;
 
   try {
     let imageUrl = "";
@@ -91,6 +95,7 @@ exports.createShop = async (req, res) => {
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path);
       imageUrl = result.secure_url;
+      console.log("Uploaded image URL:", imageUrl);
     }
 
     const newShop = new Shop({

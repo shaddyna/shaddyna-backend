@@ -85,10 +85,22 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage }).array('images'); // Allow multiple image uploads
+const uploadMultiple = multer({ storage: storage }).array('images'); // Allow multiple image uploads
+const upload = multer({ storage: storage }).single('image'); // For single file upload
+
 
 // Apply multer middleware to the product routes (as it handles file uploads)
 app.use("/api/products", (req, res, next) => {
+  uploadMultiple(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message }); // Handle any multer errors
+    }
+    next(); // Proceed to the next middleware/route handler
+  });
+});
+
+// Apply multer middleware to handle image uploads for shop creation
+app.use("/api/shops", (req, res, next) => {
   upload(req, res, (err) => {
     if (err) {
       return res.status(400).json({ error: err.message }); // Handle any multer errors
@@ -96,6 +108,7 @@ app.use("/api/products", (req, res, next) => {
     next(); // Proceed to the next middleware/route handler
   });
 });
+
 
 // Connect to the database
 connectDB();
