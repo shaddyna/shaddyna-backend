@@ -407,21 +407,37 @@ const orderController = {
     }
   },
 
-  // Controller function to get an order by its ID
-  getOrderById: async (req, res) => {
-    const { id } = req.params;
-    try {
-      const order = await authOrderModel.findById(id).populate('orderId'); // Populate orderId if necessary
-      if (!order) {
-        return res.status(404).json({ message: 'Order not found' });
+    // Controller function to get an order by its ID
+    getOrderById: async (req, res) => {
+      const { id } = req.params;
+      try {
+        const order = await authOrderModel.findById(id).populate('orderId'); // Populate orderId if necessary
+        if (!order) {
+          return res.status(404).json({ message: 'Order not found' });
+        }
+        res.status(200).json(order);
+      } catch (error) {
+        console.error('Error fetching order:', error);
+        res.status(500).json({ message: 'Internal server error' });
       }
-      res.status(200).json(order);
+    },
+
+  getOrdersByCustomerId: async (req, res) => {
+    const { customerId } = req.params;
+
+    try {
+      const orders = await customerOrder.find({ customerId }).populate('customerId'); // Populate customerId if necessary
+      if (!orders || orders.length === 0) {
+        return res.status(404).json({ message: 'No orders found for this customer' });
+      }
+      res.status(200).json(orders);
     } catch (error) {
-      console.error('Error fetching order:', error);
+      console.error('Error fetching orders by customer ID:', error);
       res.status(500).json({ message: 'Internal server error' });
     }
-  }
+  },
 };
+
 
 module.exports = orderController;
 
