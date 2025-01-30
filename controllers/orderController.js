@@ -436,6 +436,24 @@ const orderController = {
       res.status(500).json({ message: 'Internal server error' });
     }
   },
+
+  // Fetch orders by seller ID
+getOrdersBySellerId: async (req, res) => {
+  try {
+    const { sellerId } = req.params; // Seller ID from URL parameters
+    const orders = await authOrderModel.find({ sellerId });
+
+    if (!orders) {
+      return res.status(404).json({ message: "No orders found for this seller" });
+    }
+
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred while fetching orders." });
+  }
+}
+
 };
 
 

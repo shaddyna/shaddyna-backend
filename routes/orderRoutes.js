@@ -13,4 +13,6 @@ router.get('/orders/customer/:customerId', orderController.getOrdersByCustomerId
 // Route to get a specific order by ID
 router.get('/orders/:id', orderController.getOrderById);
 
+router.get('/:sellerId', orderController.getOrdersBySellerId);
+
 module.exports = router;
