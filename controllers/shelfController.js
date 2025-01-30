@@ -159,7 +159,7 @@ exports.createShelf = [
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const upload = multer({ dest: "uploads/" });
-const Shelf = require("../models/shelf");
+const Shelf = require("../models/Shelf");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
