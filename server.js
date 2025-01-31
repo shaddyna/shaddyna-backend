@@ -164,7 +164,7 @@ app.use('/api/orders', orderRoutes); // Order routes
 app.use("/api/shops", shopRoutes); // Shop routes
 app.use("/api/products", productRoutes); // Product routes
 app.use('/api/categories', categoryRoutes); // Category routes
-app.use("/api/skills", skillRoutes); // Shop routes
+app.use("/api/skill", skillRoutes); // Shop routes
 app.use('/api/members', memberRoutes);
 app.use('/api/shelf', shelfRoutes);
 app.use('/api/portfolio', portfolioRoutes);
