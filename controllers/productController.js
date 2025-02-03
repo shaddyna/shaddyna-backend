@@ -3,6 +3,7 @@ const cloudinary = require("cloudinary").v2;
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 const { Types } = require("mongoose");
+const mongoose = require('mongoose'); 
 
 // Set up multer for handling file uploads
 const upload = multer({ dest: "uploads/" }).array("images");
