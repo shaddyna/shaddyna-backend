@@ -4,6 +4,7 @@ const authorOrderSchema = new mongoose.Schema({
     //orderId: mongoose.Schema.Types.ObjectId,
     orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomerOrder', required: false, default: null },
     sellerId: String,
+    shelfId: String,
     products: Array,
     price: Number,
     payment_status: { type: String, default: 'unpaid' },

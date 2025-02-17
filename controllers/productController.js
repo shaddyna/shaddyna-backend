@@ -79,8 +79,84 @@ exports.deleteProduct = async (req, res) => {
     }
 };
 
-
 exports.addProduct = async (req, res) => {
+  console.log("Starting to process product addition...");
+  console.log("Received request with body:", req.body);
+  console.log("Received files:", req.files);
+
+  // Validate fields from body
+  const { name, price, description, categoryId, sellerId, shelfId } = req.body;
+
+  // Ensure either sellerId or shelfId is provided
+  if (!name || !price || !description || !categoryId || (!sellerId && !shelfId) || !req.files || req.files.length === 0) {
+    console.log("Missing required fields");
+    if (!name) console.log("Missing product name");
+    if (!price) console.log("Missing product price");
+    if (!description) console.log("Missing product description");
+    if (!categoryId) console.log("Missing product categoryId");
+    if (!sellerId && !shelfId) console.log("Either sellerId or shelfId is required");
+    if (!req.files) console.log("Missing file uploads");
+    if (req.files && req.files.length === 0) console.log("Missing product images");
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    // Validate categoryId
+    if (!Types.ObjectId.isValid(categoryId)) {
+      console.log("Invalid categoryId format");
+      return res.status(400).json({ error: "Invalid categoryId" });
+    }
+
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      console.log("Category not found");
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    // Validate sellerId or shelfId
+    if (sellerId && !Types.ObjectId.isValid(sellerId)) {
+      console.log("Invalid sellerId format");
+      return res.status(400).json({ error: "Invalid sellerId" });
+    }
+
+    if (shelfId && !Types.ObjectId.isValid(shelfId)) {
+      console.log("Invalid shelfId format");
+      return res.status(400).json({ error: "Invalid shelfId" });
+    }
+
+    // Upload images to Cloudinary
+    const imageUrls = await Promise.all(
+      req.files.map(async (file) => {
+        console.log("Uploading image to Cloudinary:", file.originalname);
+        const uploadedImage = await cloudinary.uploader.upload(file.path, {
+          folder: "products",
+        });
+        console.log("Uploaded image URL:", uploadedImage.secure_url);
+        return uploadedImage.secure_url;
+      })
+    );
+
+    // Create product in the database
+    const product = await Product.create({
+      name,
+      price: parseFloat(price),
+      description,
+      categoryId,
+      sellerId: sellerId || null, // Use sellerId if provided, otherwise null
+      shelfId: shelfId || null,   // Use shelfId if provided, otherwise null
+      images: imageUrls,
+    });
+
+    console.log("Product created successfully", product);
+    res.status(201).json({ message: "Created successfully", product });
+  } catch (error) {
+    console.error("Error during product creation:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+{/*exports.addProduct = async (req, res) => {
   console.log("Starting to process product addition...");
   console.log("Received request with body:", req.body);
   console.log("Received files:", req.files);
@@ -148,115 +224,8 @@ exports.addProduct = async (req, res) => {
     console.error("Error during product creation:", error);
     res.status(500).json({ error: error.message });
   }
-};
+};*/}
 
-
-/*exports.addProduct = async (req, res) => {
-    console.log("Starting to process product addition...");
-    console.log("Received request with body:", req.body);
-    console.log("Received files:", req.files);
-  
-    // Validate fields from body
-    const { name, price, description, categoryId } = req.body;
-  
-    // Check for missing required fields
-    if (!name || !price || !description || !categoryId || !req.files || req.files.length === 0) {
-      console.log("Missing required fields");
-      if (!name) console.log("Missing product name");
-      if (!price) console.log("Missing product price");
-      if (!description) console.log("Missing product description");
-      if (!categoryId) console.log("Missing product categoryId");
-      if (!req.files) console.log("Missing file uploads");
-      if (req.files && req.files.length === 0) console.log("Missing product images");
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-  
-    try {
-      // Validate categoryId
-      if (!Types.ObjectId.isValid(categoryId)) {
-        console.log("Invalid categoryId format");
-        return res.status(400).json({ error: "Invalid categoryId" });
-      }
-  
-      const category = await Category.findById(categoryId);
-      if (!category) {
-        console.log("Category not found");
-        return res.status(404).json({ error: "Category not found" });
-      }
-  
-      // Upload images to Cloudinary
-      const imageUrls = await Promise.all(
-        req.files.map(async (file) => {
-          console.log("Uploading image to Cloudinary:", file.originalname);
-          const uploadedImage = await cloudinary.uploader.upload(file.path, {
-            folder: "products", // Folder on Cloudinary where the images will be stored
-          });
-          console.log("Uploaded image URL:", uploadedImage.secure_url);
-          return uploadedImage.secure_url;
-        })
-      );
-  
-      // Create product in the database
-      const product = await Product.create({
-        name,
-        price: parseFloat(price),
-        description,
-        categoryId,
-        images: imageUrls,
-      });
-  
-      console.log("Product created successfully", product);
-      res.status(201).json({ message: "Created successfully", product });
-    } catch (error) {
-      console.error("Error during product creation:", error);
-      res.status(500).json({ error: error.message });
-    }
-  };*/
-  
-  
-/*exports.addProduct = async (req, res) => {
-    console.log("Starting to process product addition...");
-
-    const { name, price, description, categoryId } = req.body;
-
-    // Check if required fields are present
-    if (!name || !price || !description || !categoryId) {
-        console.log("Missing required fields: name, price, description, or categoryId");
-        return res.status(400).json({ error: "Missing required fields: name, price, description, or categoryId" });
-    }
-
-    try {
-        console.log("Validating categoryId:", categoryId);
-        
-        // Check if the categoryId is a valid ObjectId
-        if (!mongoose.Types.ObjectId.isValid(categoryId)) {
-            console.log("Invalid categoryId format:", categoryId);
-            return res.status(400).json({ error: "Invalid categoryId" });
-        }
-
-        // Check if the categoryId exists in the Category collection
-        const category = await Category.findById(categoryId);
-        if (!category) {
-            console.log("Category not found for categoryId:", categoryId);
-            return res.status(404).json({ error: "Category not found" });
-        }
-
-        // Save product to the database
-        const prod = await Product.create({
-            name,
-            price: parseFloat(price),
-            description,
-            categoryId, // Use the categoryId directly
-        });
-
-        console.log("Product created successfully in the database:", prod);
-        res.status(201).json({ message: "Created successfully", product: prod });
-
-    } catch (error) {
-        console.error("Error during product creation:", error);
-        res.status(500).json({ error: error.message });
-    }
-};*/
 
 // Fetch a single product by its ID
 exports.getProductById = async (req, res) => {

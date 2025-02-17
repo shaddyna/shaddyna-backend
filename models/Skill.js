@@ -29,7 +29,7 @@ module.exports = mongoose.models.Skill || mongoose.model("Skill", SkillSchema);*
 
 const mongoose = require("mongoose");
 
-const MemberSchema = new mongoose.Schema({
+const PortfolioSchema = new mongoose.Schema({
   name: String,
   description: String,
   image: String, // Added image field for each member
@@ -45,7 +45,7 @@ const SkillSchema = new mongoose.Schema({
   stdprice:String,
   stdprice: String,
   contact:String,
-  members: [MemberSchema], // Each member now includes an image
+  portfolio: [PortfolioSchema], // Each member now includes an image
 });
 
 module.exports = mongoose.models.Skill || mongoose.model("Skill", SkillSchema);

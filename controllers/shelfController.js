@@ -1,162 +1,4 @@
-/*const cloudinary = require("cloudinary");
-const Shelf = require("../models/Shelf"); // Assuming the model is in a 'models' folder
-
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
-});
-
-const multer = require("multer");
-// Configure multer to handle file uploads
-const upload = multer({ dest: "uploads/" }); // You can customize this path
-
-// Controller to create a new shelf
-exports.createShelf = [
-  upload.single("image"),  // This middleware will handle the 'image' field from the FormData
-  async (req, res) => {
-    try {
-      console.log("Received request body:", req.body); // Log the request body to ensure it's being received
-      console.log("Files in request:", req.file); // Log the files in the request
-
-      const { name, description, price } = req.body;
-      let { members } = req.body;
-
-      console.log("Destructured values - Name:", name, "Description:", description, "Price:", price, "Members:", members);
-
-      // Ensure members is parsed as an array of objects
-      try {
-        members = JSON.parse(members);
-      } catch (err) {
-        console.error("Error parsing members:", err);
-        members = []; // Default to empty array if parsing fails
-      }
-
-      // 'image' should now be available in req.file
-      const image = req.file;  // If you use .single('image'), it will be available as req.file
-      console.log("Image file:", image); // Log image file
-
-      if (!name || !description || !price || !members || !image) {
-        console.log("Validation failed - Missing fields");
-        return res.status(400).json({ message: "All fields are required" });
-      }
-
-      // Upload the image to Cloudinary
-      console.log("Uploading image to Cloudinary...");
-      const uploadResponse = await cloudinary.uploader.upload(image.path, {
-        folder: "shelves", // Optional: Specify a folder in Cloudinary
-      });
-      console.log("Cloudinary upload response:", uploadResponse); // Log the Cloudinary upload response
-
-      // Create a new shelf
-      const newShelf = new Shelf({
-        name,
-        description,
-        image: uploadResponse.secure_url, // Use the URL returned from Cloudinary
-        price,
-        members,
-      });
-
-      // Save the new shelf to the database
-      console.log("Saving new shelf to the database...");
-      const savedShelf = await newShelf.save();
-      console.log("Saved shelf:", savedShelf); // Log the saved shelf
-
-      // Respond with the saved shelf
-      return res.status(201).json(savedShelf);
-    } catch (error) {
-      console.error("Error creating shelf:", error);
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
-  },
-];*/
-
-/*const cloudinary = require("cloudinary");
-const Shelf = require("../models/shelf"); // Assuming the model is in a 'models' folder
-
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
-});
-
-const multer = require("multer");
-// Configure multer to handle file uploads
-const upload = multer({ dest: "uploads/" }); // Customize this path if necessary
-
-// Controller to create a new shelf
-exports.createShelf = [
-  upload.fields([
-    { name: 'image', maxCount: 1 }, // For shelf image
-    { name: 'members', maxCount: 10 } // Max number of member images to upload
-  ]),
-  async (req, res) => {
-    try {
-      console.log("Received request body:", req.body); // Log the request body
-      console.log("Files in request:", req.files); // Log the files
-
-      const { name, description, price } = req.body;
-      let { members } = req.body;
-
-      // Parse members from the JSON string
-      try {
-        members = JSON.parse(members);
-      } catch (err) {
-        console.error("Error parsing members:", err);
-        members = []; // Default to empty array if parsing fails
-      }
-
-      // Upload the shelf image to Cloudinary
-      const shelfImage = req.files.image ? req.files.image[0] : null;
-      let shelfImageUrl = "";
-      if (shelfImage) {
-        console.log("Uploading shelf image to Cloudinary...");
-        const uploadResponse = await cloudinary.uploader.upload(shelfImage.path, {
-          folder: "shelves",
-        });
-        shelfImageUrl = uploadResponse.secure_url;
-      }
-
-      // Upload member images to Cloudinary
-      const uploadedMembers = [];
-      for (let i = 0; i < members.length; i++) {
-        const memberImage = req.files.members && req.files.members[i] ? req.files.members[i][0] : null;
-        if (memberImage) {
-          console.log(`Uploading member ${i + 1} image to Cloudinary...`);
-          const uploadResponse = await cloudinary.uploader.upload(memberImage.path, {
-            folder: "members",
-          });
-          members[i].image = uploadResponse.secure_url; // Assign the image URL to the member
-        }
-        uploadedMembers.push(members[i]);
-      }
-
-      if (!name || !description || !price || !uploadedMembers || !shelfImageUrl) {
-        return res.status(400).json({ message: "All fields are required" });
-      }
-
-      // Create the new shelf in the database
-      const newShelf = new Shelf({
-        name,
-        description,
-        image: shelfImageUrl, // Use the shelf image URL from Cloudinary
-        price,
-        members: uploadedMembers,
-      });
-
-      // Save the new shelf to the database
-      const savedShelf = await newShelf.save();
-
-      return res.status(201).json(savedShelf);
-    } catch (error) {
-      console.error("Error creating shelf:", error);
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
-  },
-];*/
-const multer = require("multer");
+/*const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const upload = multer({ dest: "uploads/" });
 const Shelf = require("../models/Shelf");
@@ -246,4 +88,229 @@ exports.createShelf = [
       res.status(500).json({ message: "Internal Server Error" });
     }
   },
+];*/
+
+
+
+/*const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const Shelf = require("../models/Shelf");
+
+// Multer setup
+const upload = multer({ dest: "uploads/" });
+
+// Cloudinary config
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
+
+// Upload file to Cloudinary
+const uploadToCloudinary = async (filePath, folder) => {
+  try {
+    const result = await cloudinary.uploader.upload(filePath, { folder });
+    return result.secure_url;
+  } catch (error) {
+    console.error("❌ Cloudinary upload error:", error);
+    throw new Error("Failed to upload image");
+  }
+};
+
+// Create Shelf Controller
+exports.createShelf = [
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "memberImages", maxCount: 10 },
+  ]),
+  async (req, res) => {
+    try {
+      console.log("📝 Received body:", req.body);
+      console.log("🖼️ Received files:", req.files);
+
+      const { name, description, price } = req.body;
+      let members = typeof req.body.members === "string" ? JSON.parse(req.body.members) : req.body.members || [];
+
+      // Upload shelf image
+      const shelfImageUrl = req.files.image?.length > 0 ? await uploadToCloudinary(req.files.image[0].path, "shelves") : "";
+
+      // Upload member images
+      const uploadedMembers = await Promise.all(
+        members.map(async (member, index) => {
+          const memberImageUrl = req.files.memberImages?.[index] ? await uploadToCloudinary(req.files.memberImages[index].path, "members") : "";
+          return { ...member, image: memberImageUrl };
+        })
+      );
+
+      // Save shelf
+      const newShelf = new Shelf({ name, description, image: shelfImageUrl, price, members: uploadedMembers });
+      const savedShelf = await newShelf.save();
+      
+      console.log("✅ Shelf saved successfully:", savedShelf);
+      res.status(201).json(savedShelf);
+    } catch (error) {
+      console.error("❌ Error creating shelf:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  },
 ];
+
+// Get All Shelves Controller
+exports.getAllShelves = async (req, res) => {
+  try {
+    const shelves = await Shelf.find();
+    res.status(200).json(shelves);
+  } catch (error) {
+    console.error("❌ Error fetching shelves:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};*/
+
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const Shelf = require("../models/Shelf");
+const fs = require("fs");
+
+// Multer setup
+const upload = multer({ dest: "uploads/" });
+
+// Cloudinary config
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
+
+// Upload file to Cloudinary
+const uploadToCloudinary = async (filePath, folder) => {
+  try {
+    const result = await cloudinary.uploader.upload(filePath, { folder });
+    fs.unlinkSync(filePath); // Delete local file after upload
+    return result.secure_url;
+  } catch (error) {
+    console.error("❌ Cloudinary upload error:", error);
+    throw new Error("Failed to upload image");
+  }
+};
+
+// ✅ Create Shelf
+exports.createShelf = [
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "memberImages", maxCount: 10 },
+  ]),
+  async (req, res) => {
+    try {
+      console.log("📝 Received body:", req.body);
+      console.log("🖼️ Received files:", req.files);
+
+      const { name, description, price } = req.body;
+      let members = typeof req.body.members === "string" ? JSON.parse(req.body.members) : req.body.members || [];
+
+      // Upload shelf image
+      const shelfImageUrl = req.files.image?.length > 0 ? await uploadToCloudinary(req.files.image[0].path, "shelves") : "";
+
+      // Upload member images
+      const uploadedMembers = await Promise.all(
+        members.map(async (member, index) => {
+          const memberImageUrl = req.files.memberImages?.[index] ? await uploadToCloudinary(req.files.memberImages[index].path, "members") : "";
+          return { ...member, image: memberImageUrl };
+        })
+      );
+
+      // Save shelf
+      const newShelf = new Shelf({ name, description, image: shelfImageUrl, price, members: uploadedMembers });
+      const savedShelf = await newShelf.save();
+
+      console.log("✅ Shelf saved successfully:", savedShelf);
+      res.status(201).json(savedShelf);
+    } catch (error) {
+      console.error("❌ Error creating shelf:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  },
+];
+
+// ✅ Get All Shelves
+exports.getAllShelves = async (req, res) => {
+  try {
+    const shelves = await Shelf.find();
+    res.status(200).json(shelves);
+  } catch (error) {
+    console.error("❌ Error fetching shelves:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// ✅ Get Single Shelf by ID
+exports.getShelfById = async (req, res) => {
+  try {
+    const shelf = await Shelf.findById(req.params.id);
+    if (!shelf) return res.status(404).json({ message: "Shelf not found" });
+
+    res.status(200).json(shelf);
+  } catch (error) {
+    console.error("❌ Error fetching shelf:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// ✅ Update Shelf
+exports.updateShelf = [
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "memberImages", maxCount: 10 },
+  ]),
+  async (req, res) => {
+    try {
+      console.log("🔄 Updating shelf with ID:", req.params.id);
+      const { name, description, price } = req.body;
+      let members = typeof req.body.members === "string" ? JSON.parse(req.body.members) : req.body.members || [];
+
+      const shelf = await Shelf.findById(req.params.id);
+      if (!shelf) return res.status(404).json({ message: "Shelf not found" });
+
+      // Upload new shelf image if provided
+      if (req.files.image?.length > 0) {
+        shelf.image = await uploadToCloudinary(req.files.image[0].path, "shelves");
+      }
+
+      // Upload new member images
+      const updatedMembers = await Promise.all(
+        members.map(async (member, index) => {
+          const memberImageUrl = req.files.memberImages?.[index] ? await uploadToCloudinary(req.files.memberImages[index].path, "members") : member.image;
+          return { ...member, image: memberImageUrl };
+        })
+      );
+
+      // Update shelf details
+      shelf.name = name || shelf.name;
+      shelf.description = description || shelf.description;
+      shelf.price = price || shelf.price;
+      shelf.members = updatedMembers;
+
+      const updatedShelf = await shelf.save();
+      console.log("✅ Shelf updated successfully:", updatedShelf);
+      res.status(200).json(updatedShelf);
+    } catch (error) {
+      console.error("❌ Error updating shelf:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  },
+];
+
+// ✅ Delete Shelf
+exports.deleteShelf = async (req, res) => {
+  try {
+    const shelf = await Shelf.findByIdAndDelete(req.params.id);
+    if (!shelf) return res.status(404).json({ message: "Shelf not found" });
+
+    console.log("🗑️ Shelf deleted:", shelf);
+    res.status(200).json({ message: "Shelf deleted successfully" });
+  } catch (error) {
+    console.error("❌ Error deleting shelf:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+

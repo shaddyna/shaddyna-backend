@@ -1,4 +1,4 @@
-const Transaction = require('../models/Transaction');
+/*const Transaction = require('../models/Transaction');
 const Balance = require('../models/Balance');
 
 const createSeminarPayment = async (req, res) => {
@@ -56,4 +56,108 @@ const createSeminarPayment = async (req, res) => {
   }
 };
 
-module.exports = { createSeminarPayment };
+module.exports = { createSeminarPayment };*/
+const Seminar = require('../models/Seminar');
+const cloudinary = require('../config/cloudinary');
+
+/**
+ * @desc    Create a new seminar with image upload
+ * @route   POST /api/seminars
+ * @access  Public
+ */
+const createSeminar = async (req, res) => {
+  try {
+    const { name, description, date, amount } = req.body;
+    
+    if (!req.file) {
+      return res.status(400).json({ error: "Image is required" });
+    }
+
+    // Upload image to Cloudinary
+    const uploadPromise = new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "seminars" },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result.secure_url);
+        }
+      );
+      stream.end(req.file.buffer);
+    });
+
+    const imageUrl = await uploadPromise;
+    const newSeminar = new Seminar({ name, description, date, amount, image: imageUrl });
+    await newSeminar.save();
+
+    res.status(201).json({ message: "Seminar created successfully", newSeminar });
+  } catch (error) {
+    console.error("Error creating seminar:", error);
+    res.status(500).json({ error: "Failed to create seminar" });
+  }
+};
+
+/**
+ * @desc    Get all seminars
+ * @route   GET /api/seminars
+ * @access  Public
+ */
+const getSeminars = async (req, res) => {
+  try {
+    const seminars = await Seminar.find();
+    res.status(200).json(seminars);
+  } catch (error) {
+    console.error("Error fetching seminars:", error);
+    res.status(500).json({ error: "Failed to fetch seminars" });
+  }
+};
+
+// Get a single seminar by ID
+ const getSeminarById = async (req, res) => {
+  try {
+    const seminar = await Seminar.findById(req.params.id);
+    if (!seminar) return res.status(404).json({ error: "Seminar not found" });
+    res.status(200).json(seminar);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch seminar" });
+  }
+};
+
+// Update a seminar
+const updateSeminar = async (req, res) => {
+  try {
+    const { name, image, description, date, amount } = req.body;
+    const updatedSeminar = await Seminar.findByIdAndUpdate(
+      req.params.id,
+      { name, image, description, date, amount },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedSeminar) return res.status(404).json({ error: "Seminar not found" });
+
+    res.status(200).json({ message: "Seminar updated successfully", updatedSeminar });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update seminar" });
+  }
+};
+
+// Delete a seminar
+ const deleteSeminar = async (req, res) => {
+  try {
+    const deletedSeminar = await Seminar.findByIdAndDelete(req.params.id);
+    if (!deletedSeminar) return res.status(404).json({ error: "Seminar not found" });
+
+    res.status(200).json({ message: "Seminar deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete seminar" });
+  }
+};
+
+module.exports = {
+  createSeminar,
+  getSeminars,
+  deleteSeminar,
+  updateSeminar,
+  getSeminarById,
+};
+
+

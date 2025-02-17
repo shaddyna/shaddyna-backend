@@ -6,6 +6,11 @@ const productSchema = new mongoose.Schema({
     ref: 'Seller',
     required: false,
   },
+  shelfId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Shelf', // Reference to the Shelf model instead of Seller
+    required: false,
+  },
   name: { type: String, required: false },
   slug: { type: String, required: false, unique: false },
   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: false },
