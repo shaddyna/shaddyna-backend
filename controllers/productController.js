@@ -79,6 +79,25 @@ exports.deleteProduct = async (req, res) => {
     }
 };
 
+exports.createProduct = async (req, res) => {
+  try {
+    const { name, category, attributes } = req.body;
+    const images = req.files.map((file) => file.path);
+
+    const product = new Product({
+      name,
+      category,
+      attributes: JSON.parse(attributes),
+      images,
+    });
+
+    await product.save();
+    res.status(201).json({ message: "Product created successfully", product });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.addProduct = async (req, res) => {
   console.log("Starting to process product addition...");
   console.log("Received request with body:", req.body);

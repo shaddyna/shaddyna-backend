@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+/*const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
   sellerId: {
@@ -26,4 +26,20 @@ const productSchema = new mongoose.Schema({
   tags: [{ type: String }],
 }, { timestamps: false });
 
-module.exports = mongoose.model('Product', productSchema);
+module.exports = mongoose.model('Product', productSchema);*/
+
+import mongoose from "mongoose";
+
+const productSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    category: { type: String, required: true },
+    attributes: { type: mongoose.Schema.Types.Mixed, required: true }, // Dynamic attributes
+    images: { type: [String], required: true },
+  },
+  { timestamps: true }
+);
+
+const Product = mongoose.model("Product", productSchema);
+export default Product;
+

@@ -545,6 +545,7 @@ const chatRoutes = require('./routes/chatRoutes');
 const seminarRoutes = require('./routes/seminarRoutes');
 const startupRoutes = require('./routes/startupRoutes');
 const seminarPaymentRoutes = require('./routes/seminarPaymentRoutes');
+const withdrawRoutes = require('./routes/withdrawRoutes');
 const connectDB = require('./config/db');
 
 // Load environment variables
@@ -657,6 +658,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/seminars', seminarRoutes);
 app.use('/api/startups', startupRoutes);
 app.use('/api/spayment', seminarPaymentRoutes)
+//app.use('/api/withdraw', withdrawRoutes)
 
 
 // Set up Socket.io connection

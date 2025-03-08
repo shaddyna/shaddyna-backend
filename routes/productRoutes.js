@@ -53,4 +53,3 @@ router.get('/', getProductsByCategory);
 router.get('/:id', getProductsBySellerId);
 
 module.exports = router;
-

@@ -19,7 +19,7 @@ const mongoose = require("mongoose");
 const MemberSchema = new mongoose.Schema({
   name: String,
   role: String,
-  image: String, // Added image field for each member
+  image: String, 
 });
 
 const ShelfSchema = new mongoose.Schema({
@@ -27,7 +27,7 @@ const ShelfSchema = new mongoose.Schema({
   description: String,
   image: String,
   price: String,
-  members: [MemberSchema], // Each member now includes an image
+  members: [MemberSchema], 
 });
 
 module.exports = mongoose.models.Shelf || mongoose.model("Shelf", ShelfSchema);
