@@ -597,14 +597,14 @@ const uploadMultiple = multer({ storage: storage }).array('images'); // Allow mu
 const upload = multer({ storage: storage }).single('image'); // For single file upload
 
 // Apply multer middleware to handle image uploads for different routes
-app.use("/api/products", (req, res, next) => {
+/*app.use("/api/products", (req, res, next) => {
   uploadMultiple(req, res, (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
     next();
   });
-});
+});*/
 
 // Apply multer middleware to handle image uploads for shop creation
 app.use("/api/shops", (req, res, next) => {
@@ -653,8 +653,8 @@ app.use('/api/members', memberRoutes);
 app.use('/api/shelf', shelfRoutes);
 app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/saving', savingRoutes);
-app.use('/api/purchase', purchaseRoutes);
-app.use('/api/chat', chatRoutes);
+app.use('/api/purchase', purchaseRoutes);  
+app.use('/api/chat', chatRoutes); 
 app.use('/api/seminars', seminarRoutes);
 app.use('/api/startups', startupRoutes);
 app.use('/api/spayment', seminarPaymentRoutes)

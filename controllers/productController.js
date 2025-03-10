@@ -79,24 +79,95 @@ exports.deleteProduct = async (req, res) => {
     }
 };
 
+
 exports.createProduct = async (req, res) => {
   try {
-    const { name, category, attributes } = req.body;
-    const images = req.files.map((file) => file.path);
+    console.log("Received request to create product:", req.body);
 
+    const { name, stock, price, category, attributes } = req.body;
+
+    if (!req.files || req.files.length === 0) {
+      console.error("No images uploaded.");
+      return res.status(400).json({ error: "At least one image is required" });
+    }
+
+    console.log(`Received ${req.files.length} images for upload`);
+
+    // Upload all images to Cloudinary concurrently
+    const uploadPromises = req.files.map((file) =>
+      new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: "products" },
+          (error, uploadResult) => {
+            if (error) {
+              console.error("Cloudinary upload error:", error);
+              reject(error);
+            } else {
+              console.log("Image uploaded successfully:", uploadResult.secure_url);
+              resolve(uploadResult.secure_url);
+            }
+          }
+        );
+        uploadStream.end(file.buffer);
+      })
+    );
+
+    // Wait for all uploads to complete
+    const uploadedImages = await Promise.all(uploadPromises);
+
+    console.log("All images uploaded successfully:", uploadedImages);
+
+    // Save product in the database
     const product = new Product({
       name,
+      stock,
+      price,
       category,
       attributes: JSON.parse(attributes),
-      images,
+      images: uploadedImages,
     });
 
+    console.log("Saving product to database:", product);
     await product.save();
+
+    console.log("Product saved successfully:", product);
     res.status(201).json({ message: "Product created successfully", product });
+
   } catch (error) {
+    console.error("Error creating product:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
+
+exports.getRelatedProducts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`Fetching related products for product ID: ${id}`);
+
+    // Find the current product
+    const currentProduct = await Product.findById(id);
+    if (!currentProduct) {
+      console.log(`Product not found with ID: ${id}`);
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    console.log("Current product found:", currentProduct);
+
+    // Fetch related products based on category or similar attributes
+    const relatedProducts = await Product.find({
+      category: currentProduct.category,
+      _id: { $ne: id }, // Exclude the current product
+    }).limit(4); // Limit the number of related products
+
+    console.log(`Found ${relatedProducts.length} related products.`);
+    res.json({ relatedProducts });
+  } catch (error) {
+    console.error("Error fetching related products:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 exports.addProduct = async (req, res) => {
   console.log("Starting to process product addition...");

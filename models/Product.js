@@ -28,18 +28,21 @@ const productSchema = new mongoose.Schema({
 
 module.exports = mongoose.model('Product', productSchema);*/
 
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
+
 
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    stock: { type: Number, required: true },
+    description: { type: String, required: false },
+    price: { type: Number, required: true },
     category: { type: String, required: true },
-    attributes: { type: mongoose.Schema.Types.Mixed, required: true }, // Dynamic attributes
+    attributes: { type: mongoose.Schema.Types.Mixed, required: true }, 
     images: { type: [String], required: true },
   },
   { timestamps: true }
 );
 
 const Product = mongoose.model("Product", productSchema);
-export default Product;
-
+module.exports = Product;

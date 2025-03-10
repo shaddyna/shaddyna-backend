@@ -20,6 +20,10 @@ router.get('/', getProductsByCategory);
 module.exports = router;*/
 
 const express = require('express');
+const multer = require("multer");
+// Multer setup
+const storage = multer.memoryStorage(); // Store in memory before uploading to Cloudinary
+const upload = multer({ storage });
 const router = express.Router();
 const { 
   getProductsByCategory, 
@@ -28,6 +32,8 @@ const {
   editProduct, 
   deleteProduct, 
   getProductById, 
+  createProduct,
+  getRelatedProducts,
   getProductsBySellerId // Import the new controller function
 } = require('../controllers/productController');
 
@@ -52,4 +58,10 @@ router.get('/', getProductsByCategory);
 // Route to get products by sellerId
 router.get('/:id', getProductsBySellerId);
 
+
+router.get("/related/:id", getRelatedProducts);
+
+router.post("/", upload.array("images", 5), createProduct);
+
 module.exports = router;
+
