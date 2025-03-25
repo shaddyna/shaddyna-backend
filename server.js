@@ -568,11 +568,14 @@ const io = socketIo(server, {
 // Middleware setup for CORS
 const cors = require('cors');
 app.use(cors({
-  origin: ["http://localhost:3000", "https://www.shaddyna.com", "https://shaddyna-frontend.onrender.com"],
+  origin: ["http://localhost:3000", "https://shaddyna-59if.onrender.com", "https://www.shaddyna.com", "https://shaddyna-frontend.onrender.com"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type","Authorization"],
   credentials: true, // Allow credentials (cookies, headers, etc.)
 }));
+
+
+
 
 // Middleware to pass the io instance to req
 app.use((req, res, next) => {
