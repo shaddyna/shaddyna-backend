@@ -557,7 +557,7 @@ const server = http.createServer(app);
 // Set up Socket.io with Express
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://www.shaddyna.com", "https://shaddyna-frontend.onrender.com"], 
+    origin: ["http://localhost:3000", "https://shaddyna-59if.onrender.com", "https://www.shaddyna.com", "https://shaddyna-frontend.onrender.com"], 
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"], 
     credentials: true, // Allow credentials (cookies, headers, etc.)
