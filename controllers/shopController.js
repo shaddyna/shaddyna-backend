@@ -5,7 +5,8 @@ const cloudinary = require("cloudinary").v2;
 // Fetch all shops
 exports.getAllShops = async (req, res) => {
     try {
-      const shops = await Shop.find().populate("sellerId", "name email"); // Populate seller details
+      //const shops = await Shop.find().populate("sellerId", "name email");
+      const shops = await Shop.find().populate("name email"); // Populate seller details
       res.status(200).json({ message: "Shops fetched successfully", shops });
     } catch (error) {
       console.error("Error fetching shops:", error);
