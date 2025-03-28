@@ -610,14 +610,14 @@ const upload = multer({ storage: storage }).single('image'); // For single file 
 });*/
 
 // Apply multer middleware to handle image uploads for shop creation
-app.use("/api/shops", (req, res, next) => {
-  upload(req, res, (err) => {
+/*app.use("/api/shops", (req, res, next) => {
+  uploadMultiple(req, res, (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
     next();
   });
-});
+});*/
 
 // Apply multer middleware to handle image uploads for skills creation
 app.use("/api/skills", (req, res, next) => {

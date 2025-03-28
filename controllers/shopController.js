@@ -79,7 +79,7 @@ cloudinary.config({
 });
 
 
-exports.createShop = async (req, res) => {
+/*exports.createShop = async (req, res) => {
   console.log("Incoming request body:", req.body);
   console.log("Incoming file:", req.file); // Logs the file object from multer
 
@@ -118,3 +118,116 @@ exports.createShop = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error });
   }
 };
+*/
+
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
+
+exports.createShop = async (req, res) => {
+  try {
+    console.log("Received request to create shop:", req.body);
+
+    const { 
+      name, 
+      description, 
+      phoneNumber, 
+      openingHours, 
+      closingHours, 
+      email, 
+      location, 
+      category, 
+      attributes,
+      socialMedias
+    } = req.body;
+
+  // Basic validation
+if (!name || !description || !phoneNumber || !email || !location || !category) {
+  console.error("Missing required fields:", {
+    name,
+    description,
+    phoneNumber,
+    email,
+    location,
+    category
+  });
+
+  return res.status(400).json({ error: "Please fill all required fields" });
+}
+
+if (!req.files || req.files.length === 0) {
+  console.error("No images uploaded");
+  return res.status(400).json({ error: "At least one image is required" });
+}
+
+
+    console.log(`Received ${req.files.length} images for upload`);
+
+    // Upload all images to Cloudinary concurrently
+    const uploadPromises = req.files.map((file) =>
+      new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: "shops" }, // Changed folder name to "shops"
+          (error, uploadResult) => {
+            if (error) {
+              console.error("Cloudinary upload error:", error);
+              reject(error);
+            } else {
+              console.log("Image uploaded successfully:", uploadResult.secure_url);
+              resolve(uploadResult.secure_url);
+            }
+          }
+        );
+        uploadStream.end(file.buffer);
+      })
+    );
+
+    // Wait for all uploads to complete
+    const uploadedImages = await Promise.all(uploadPromises);
+
+    console.log("All images uploaded successfully:", uploadedImages);
+
+    // Create new shop
+    const shop = new Shop({
+      name,
+      description,
+      phoneNumber,
+      openingHours: openingHours || "09:00",
+      closingHours: closingHours || "18:00",
+      email,
+      location,
+      category,
+      attributes: JSON.parse(attributes),
+      socialMedias: JSON.parse(socialMedias) || [],
+      images: uploadedImages,
+      //owner: req.user._id // Assuming you have user authentication
+    });
+
+    await shop.save();
+
+    console.log("Shop created successfully:", shop);
+    res.status(201).json({ 
+      message: "Shop created successfully", 
+      shop: {
+        _id: shop._id,
+        name: shop.name,
+        description: shop.description,
+        category: shop.category,
+        images: shop.images,
+        // Include other fields you want to return
+      }
+    });
+
+  } catch (error) {
+    console.error("Error creating shop:", error);
+    res.status(500).json({ 
+      error: error.message || "An error occurred while creating the shop" 
+    });
+  }
+};
+
+// Other controller methods remain the same...
