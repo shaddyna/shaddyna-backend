@@ -43,6 +43,7 @@ const shopSchema = new mongoose.Schema(
     location: { type: String, required: true },
     category: { type: String, required: true },
     attributes: { type: mongoose.Schema.Types.Mixed, required: true },
+    sellerId: { type: mongoose.Schema.Types.ObjectId, ref: "Seller", required: true },
     socialMedias: { 
       type: [{
         platform: String,
