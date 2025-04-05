@@ -672,6 +672,7 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", (roomId) => {
     socket.join(roomId);
     console.log(`User joined room: ${roomId}`);
+    
   });
 
   // Handle user leaving the room
@@ -700,6 +701,4 @@ io.on("connection", (socket) => {
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});
-
-
+});  
