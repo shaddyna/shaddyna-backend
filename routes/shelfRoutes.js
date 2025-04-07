@@ -1,29 +1,41 @@
-/*const express = require("express");
+/*const express = require('express');
 const router = express.Router();
-const { createShelf, getAllShelves, getShelfById, updateShelf, deleteShelf } = require("../controllers/shelfController");
+const shelfController = require('../controllers/shelfController');
 
-router.post("/create", createShelf);
-router.get("/shelves", getAllShelves);
-router.get("/:id", getShelfById);
-router.put("/:id", updateShelf);
-router.delete("/:id", deleteShelf);
-// Route to get a specific shop by ID
-//router.get("/:id", getShopById); 
+router.post(
+  "/create",
+  shelfController.upload.array('images'), // Handle file uploads
+  shelfController.createShelf
+);
+
+// Get all shelves
+router.get("/shelves",  shelfController.getAllShelves);
 
 module.exports = router;*/
 
-const User = require("../models/User");
-const express = require("express");
-//const {shelfController} = require("../controllers/shelfController");
-const { createShelf, getAllShelves, getShelfById, updateShelf, deleteShelf } = require("../controllers/shelfController");
-
+const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const shelfController = require('../controllers/shelfController');
 
-// Create a new shelf
-router.post("/create", createShelf);
+// Configure Multer storage
+const storage = multer.memoryStorage(); // Or use diskStorage if needed
+const upload = multer({ 
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    console.log('Processing file:', file.fieldname, file.originalname);
+    cb(null, true);
+  }
+});
+
+// Route with proper Multer configuration
+router.post(
+  "/create",
+  upload.any(), // or upload.array('images') if you know the exact field name
+  shelfController.createShelf
+);
 
 // Get all shelves
-router.get("/shelves", getAllShelves);
-
+router.get("/shelves", shelfController.getAllShelves);
 
 module.exports = router;
