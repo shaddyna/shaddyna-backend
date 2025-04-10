@@ -29,7 +29,7 @@ const memberSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ['member', 'nonmember'],
-    default: 'nonmember', // Default value is 'nonmember'
+    default: 'nonmember', 
   },
   createdAt: {
     type: Date,

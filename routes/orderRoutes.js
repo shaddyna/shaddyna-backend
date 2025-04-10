@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
 
@@ -14,5 +14,22 @@ router.get('/orders/customer/:customerId', orderController.getOrdersByCustomerId
 router.get('/orders/:id', orderController.getOrderById);
 
 router.get('/:sellerId', orderController.getOrdersBySellerId);
+
+module.exports = router;*/
+
+const express = require('express');
+const { createOrder, getUserOrders, getOrderDetails } = require('../controllers/orderController');
+const protect = require('../middleware/authMiddleware');
+
+const router = express.Router();
+
+// Create a new order
+router.post('/', protect, createOrder);
+
+// Get user's orders
+router.get('/my-orders', protect, getUserOrders);
+
+// Get order details
+router.get('/:id', protect, getOrderDetails);
 
 module.exports = router;

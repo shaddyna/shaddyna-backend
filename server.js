@@ -546,6 +546,7 @@ const seminarRoutes = require('./routes/seminarRoutes');
 const startupRoutes = require('./routes/startupRoutes');
 const seminarPaymentRoutes = require('./routes/seminarPaymentRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
+const transferRoutes = require('./routes/transferRoutes');
 const withdrawRoutes = require('./routes/withdrawRoutes');
 const connectDB = require('./config/db');
 
@@ -663,6 +664,7 @@ app.use('/api/seminars', seminarRoutes);
 app.use('/api/startups', startupRoutes);
 app.use('/api/spayment', seminarPaymentRoutes)
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/transfer', transferRoutes);
 //app.use('/api/withdraw', withdrawRoutes)
 
 
