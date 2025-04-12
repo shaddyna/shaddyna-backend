@@ -1,6 +1,7 @@
 const Skill = require('../models/Skill');
 const cloudinary = require('cloudinary').v2;
 const { Readable } = require('stream');
+const mongoose = require('mongoose');
 
 // Configure Cloudinary
 cloudinary.config({
