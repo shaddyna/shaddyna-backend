@@ -665,7 +665,7 @@ app.use('/api/startups', startupRoutes);
 app.use('/api/spayment', seminarPaymentRoutes)
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/transfer', transferRoutes);
-//app.use('/api/withdraw', withdrawRoutes)
+app.use('/api/withdraw', withdrawRoutes)
 
 
 // Set up Socket.io connection

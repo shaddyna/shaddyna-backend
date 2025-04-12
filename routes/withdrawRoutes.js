@@ -1,11 +1,9 @@
-const express = require("express");
+const express = require('express');
+const { createWithdrawal } = require('../controllers/withdrawController');
+const protect = require('../middleware/authMiddleware');
 const router = express.Router();
-//const withdrawalController = require("../controllers/withdrawalController");
-const authMiddleware = require("../middleware/authMiddleware"); // Ensure user is authenticated
-//const adminMiddleware = require("../middleware/adminMiddleware"); // Ensure admin access
 
-//router.get("/balance", authMiddleware, withdrawalController.getBalance);
-//router.post("/withdraw", authMiddleware, withdrawalController.requestWithdrawal);
-//router.patch("/withdraw/:id", adminMiddleware, withdrawalController.updateWithdrawalStatus);
+// POST route to create a withdrawal
+router.post('/', protect, createWithdrawal);
 
 module.exports = router;
