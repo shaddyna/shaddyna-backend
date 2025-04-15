@@ -30,6 +30,6 @@ router.post('/', protect, createOrder);
 router.get('/my-orders', protect, getUserOrders);
 
 // Get order details
-router.get('/:id', protect, getOrderDetails);
+router.get('orders/:id', protect, getOrderDetails);
 
 module.exports = router;
