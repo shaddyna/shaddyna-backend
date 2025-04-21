@@ -100,7 +100,7 @@ const Order = mongoose.model('Order', orderSchema);
 
 export default Order;*/
 
-import mongoose from 'mongoose';
+const mongoose = require("mongoose");
 
 const paymentItemSchema = new mongoose.Schema({
   _id: {
@@ -205,5 +205,5 @@ const orderSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const Order = mongoose.model('Order', orderSchema);
-
-export default Order;
+module.exports =  Order;
+ 

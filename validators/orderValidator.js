@@ -1,6 +1,8 @@
-import Joi from 'joi';
 
-export const shippingValidator = Joi.object({
+const Joi = require("joi");
+
+
+const shippingValidator = Joi.object({
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
   email: Joi.string().email().required(),
@@ -11,7 +13,7 @@ export const shippingValidator = Joi.object({
   additionalInfo: Joi.string().allow('')
 });
 
-export const paymentValidator = Joi.object({
+ const paymentValidator = Joi.object({
   sellerId: Joi.string().required(),
   phoneNumber: Joi.string().min(10).required(),
   mpesaCode: Joi.string().required(),
@@ -24,8 +26,8 @@ export const paymentValidator = Joi.object({
     })
   ).required()
 });
-
-export const orderValidator = Joi.object({
+ 
+const orderValidator = Joi.object({
   shippingInfo: shippingValidator.required(),
   payments: Joi.array().items(paymentValidator).min(1).required(),
   items: Joi.array().items(
@@ -42,3 +44,8 @@ export const orderValidator = Joi.object({
     })
   ).min(1).required()
 });
+
+module.exports = {
+  paymentValidator,
+  shippingValidator
+};

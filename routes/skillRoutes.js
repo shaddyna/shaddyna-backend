@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const skillsController = require('../controllers/skillController');
@@ -41,5 +41,21 @@ router.get('/', skillsController.getAllSkills);
 router.get('/:id', skillsController.getSkillById);
 
 
+
+module.exports = router;*/
+
+const express = require('express');
+const router = express.Router();
+const skillController = require('../controllers/skillController');
+const upload = require('../middleware/uploadMiddleware');
+const protect = require('../middleware/authMiddleware')
+
+// Create a new skill
+router.post(
+  '/',
+  protect,
+  upload.array('images', 3), // Max 3 images
+  skillController.createSkill
+);
 
 module.exports = router;

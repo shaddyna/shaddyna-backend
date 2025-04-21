@@ -1,4 +1,4 @@
-const Skill = require('../models/Skill');
+/*const Skill = require('../models/Skill');
 const cloudinary = require('cloudinary').v2;
 const { Readable } = require('stream');
 const mongoose = require('mongoose');
@@ -204,6 +204,87 @@ exports.getSkillById = async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Server error while fetching skill'
+    });
+  }
+};*/
+
+
+const Skill = require('../models/Skill');
+const cloudinary = require('cloudinary').v2;
+const User = require('../models/User');
+const streamifier = require('streamifier'); // Add this package to handle buffer streams
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
+
+// Helper function to upload buffer to Cloudinary
+const uploadToCloudinary = (file) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: 'skills' },
+      (error, result) => {
+        if (result) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      }
+    );
+
+    streamifier.createReadStream(file.buffer).pipe(uploadStream);
+  });
+};
+
+exports.createSkill = async (req, res) => {
+  try {
+    // Get user data
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Upload images to Cloudinary from memory
+    const imageUrls = [];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const result = await uploadToCloudinary(file);
+        imageUrls.push(result.secure_url);
+      }
+    }
+
+    // Create skill
+    const skillData = {
+      ...req.body,
+      images: imageUrls,
+      createdBy: {
+        id: user._id,
+        name: user.name,
+        avatar: user.avatar,
+        bio: user.bio,
+        location: user.location,
+        skills: user.skills,
+        joinedAt: user.createdAt
+      }
+    };
+
+    // Convert tags from string to array if needed
+    if (typeof skillData.tags === 'string') {
+      skillData.tags = skillData.tags.split(',').map(tag => tag.trim());
+    }
+
+    const skill = new Skill(skillData);
+    await skill.save();
+
+    res.status(201).json(skill);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ 
+      message: 'Server error',
+      error: error.message 
     });
   }
 };

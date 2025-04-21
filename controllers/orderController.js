@@ -1,8 +1,8 @@
-import Order from '../models/Order.js';
-import { orderValidator } from '../validators/orderValidator.js';
-import Product from '../models/Product.js';
+const Order = require('../models/Order');
+const { orderValidator } = require('../validators/orderValidator');
+const Product = require('../models/Product');
 
-export const createOrder = async (req, res) => {
+const createOrder = async (req, res) => {
   try {
     console.log("Received request body:", req.body);
 
@@ -96,116 +96,8 @@ export const createOrder = async (req, res) => {
   }
 };
 
-/*import Order from '../models/Order.js';
-import { orderValidator } from '../validators/orderValidator.js';
-import Product from '../models/Product.js';
-
-export const createOrder = async (req, res) => {
-  try {
-    console.log("Received request body:", req.body); // Log the incoming request
-
-   // Validate request body
-const { error } = orderValidator.validate(req.body);
-if (error) {
-  // Log the full error details to the console
-  console.log('Validation error:', error.details);
-
-  // Send a response with the error message
-  return res.status(400).json({ 
-    error: error.details[0].message,
-    details: error.details // this will provide more detailed error information
-  });
-}
-
-    const { shippingInfo, payments, items } = req.body;
-
-    // Verify the buyer matches the authenticated user
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ error: 'Unauthorized - Invalid user session' });
-    }
-
-    // Calculate total amount
-    const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
-    
-    // Create order
-    const order = new Order({
-      buyerId: req.user.id, 
-      shippingInfo, 
-      payments, 
-      totalAmount,
-      status: 'pending'
-    });
-
-    // Log before processing items
-    console.log("Validating items:", items);
-
-    // Additional validation: Verify all items belong to the specified sellers
- // Additional validation: Verify all items belong to the specified sellers
-for (const payment of payments) {
-  for (const item of items) { 
-    const product = await Product.findById(item._id);
-    if (!product) {
-      console.log(`Product not found: ${item._id}`);
-      return res.status(400).json({ 
-        error: `Product ${item._id} not found` 
-      });
-    }
-
-    console.log(`Validating product ${item._id} with sellerId ${item.sellerId}`);
-    
-    // Ensure sellerId comparison is between strings
-    if (!item.sellerId) {
-      console.log(`Product ${item._id} does not have a valid sellerId`);
-      return res.status(400).json({ 
-        error: `Product ${item._id} does not have a valid sellerId` 
-      });
-    }
-    
-    const productSellerId = item.sellerId.toString(); // Ensure it’s a string for comparison
-    console.log(`Product Seller ID (string): ${productSellerId}`);
-    console.log(`Payment Seller ID: ${payment.sellerId}`);
-    
-    if (productSellerId !== payment.sellerId) {
-      console.log(`Seller mismatch: Product ${item._id} belongs to seller ${productSellerId}, but payment is for seller ${payment.sellerId}`);
-      return res.status(400).json({ 
-        error: `Product ${item._id} does not belong to seller ${payment.sellerId}` 
-      });
-    }
-  }
-}
- 
-    
- 
-    // Save order
-    await order.save();
-
-    // Log after saving order
-    console.log("Order saved successfully:", order);
-
-    // Update product stocks
-    for (const item of items) {
-      await Product.findByIdAndUpdate(item._id, {
-        $inc: { stock: -item.quantity }
-      });
-    }
-
-    res.status(201).json({
-      success: true,
-      message: 'Order created successfully',
-      order
-    });
-  } catch (error) {
-    console.error('Error creating order:', error);
-    res.status(500).json({ 
-      error: 'Failed to create order',
-      details: error.message 
-    });
-  }
-};
-*/
-
 // Get user's orders with enhanced security
-export const getUserOrders = async (req, res) => {
+const getUserOrders = async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
       return res.status(401).json({ error: 'Unauthorized - Invalid user session' });
@@ -237,7 +129,7 @@ export const getUserOrders = async (req, res) => {
 };
 
 // Get order details with strict access control
-export const getOrderDetails = async (req, res) => {
+ const getOrderDetails = async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
       return res.status(401).json({ error: 'Unauthorized - Invalid user session' });
@@ -284,4 +176,10 @@ export const getOrderDetails = async (req, res) => {
       details: error.message 
     });
   }
+};
+
+module.exports = {
+  createOrder,
+  getUserOrders,
+  getOrderDetails
 };
