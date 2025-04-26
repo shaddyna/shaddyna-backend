@@ -63,6 +63,7 @@ const loginUser = async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        member: user.member,
       };
 
       console.log("User data to send in response:", userData);
@@ -81,4 +82,17 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { registerUser, loginUser, getMe };

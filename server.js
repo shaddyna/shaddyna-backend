@@ -25,6 +25,8 @@ const transactionRoutes = require('./routes/transactionRoutes');
 const transferRoutes = require('./routes/transferRoutes');
 const withdrawRoutes = require('./routes/withdrawRoutes');
 const investmentRoutes = require('./routes/investmentRoutes')
+const postRoutes = require('./routes/postRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 const connectDB = require('./config/db');
 
 // Load environment variables
@@ -36,7 +38,7 @@ const server = http.createServer(app);
 // Set up Socket.io with Express
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://shaddyna-59if.onrender.com", "https://www.shaddyna.com", "https://shaddyna-frontend.onrender.com"], 
+    origin: ["http://localhost:3000", "http://localhost:3001", "https://shaddyna-59if.onrender.com", "https://www.shaddyna.com", "https://shaddyna-frontend.onrender.com"], 
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"], 
     credentials: true, // Allow credentials (cookies, headers, etc.)
@@ -47,7 +49,7 @@ const io = socketIo(server, {
 // Middleware setup for CORS
 const cors = require('cors');
 app.use(cors({
-  origin: ["http://localhost:3000", "https://shaddyna-59if.onrender.com", "https://www.shaddyna.com", "https://shaddyna-frontend.onrender.com"],
+  origin: ["http://localhost:3000", "http://localhost:3001", "https://shaddyna-59if.onrender.com", "https://www.shaddyna.com", "https://shaddyna-frontend.onrender.com"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type","Authorization"],
   credentials: true, // Allow credentials (cookies, headers, etc.)
@@ -119,41 +121,45 @@ app.use('/api/spayment', seminarPaymentRoutes)
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/transfer', transferRoutes);
 app.use('/api/withdraw', withdrawRoutes)
-app.use('/api/investments', investmentRoutes)
+app.use('/api/investments', investmentRoutes) 
+app.use('/api/shellf/posts', postRoutes);
+app.use('/api/upload', uploadRoutes);
 
-
-// Set up Socket.io connection
+// Example on the server-side
 io.on("connection", (socket) => {
-  console.log("New client connected");
+  console.log(`\n🚀 New connection: User ${socket.id} connected`);
 
-  // Handle user joining a specific room (chat with specific receiver)
+  // When a user joins a room
   socket.on("joinRoom", (roomId) => {
+    console.log(`\n📥 User ${socket.id} joining room: ${roomId}`);
     socket.join(roomId);
-    console.log(`User joined room: ${roomId}`);
-    
+    console.log(`✅ User ${socket.id} successfully joined room: ${roomId}`);
   });
 
-  // Handle user leaving the room
+  // When a user sends a message
+  socket.on("sendMessage", (message) => {
+    const roomId = `${message.sender}_${message.receiver}`;
+    console.log(`\n💬 User ${message.sender} sending message to room: ${roomId}`);
+    console.log(`📝 Message content: ${message.text}`);
+    console.log(`👥 Room members: ${roomId}`);
+
+    io.to(roomId).emit("receiveMessage", message); // Emit the message to the room
+    console.log(`✅ Message sent to room ${roomId}, notifying receiver ${message.receiver}`);
+  });
+
+  // When a user leaves a room
   socket.on("leaveRoom", (roomId) => {
+    console.log(`\n📤 User ${socket.id} leaving room: ${roomId}`);
     socket.leave(roomId);
-    console.log(`User left room: ${roomId}`);
+    console.log(`✅ User ${socket.id} successfully left room: ${roomId}`);
   });
 
-  // Handle incoming chat messages
-  socket.on("sendMessage", (data) => {
-    // Create a unique room identifier for the sender and receiver
-    const roomId = `${data.sender}_${data.receiver}`;
-
-    // Emit message to the specific room (sender and receiver)
-    io.to(roomId).emit("receiveMessage", data);
-    console.log("Message sent to room:", roomId, data);
-  });
-
-  // Handle client disconnecting
+  // When a user disconnects
   socket.on("disconnect", () => {
-    console.log("Client disconnected");
+    console.log(`\n❌ User ${socket.id} disconnected`);
   });
 });
+
 
 // Start the server
 const PORT = process.env.PORT || 5000;

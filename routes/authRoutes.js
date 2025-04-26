@@ -13,17 +13,14 @@ module.exports = router;*/
 
 
 const express = require('express');
-const { loginUser, registerUser } = require('../controllers/authController');  // Import the function
+const { loginUser, registerUser, getMe } = require('../controllers/authController');  // Import the function
 const router = express.Router();
+const  protect  = require('../middleware/authMiddleware');
 
-router.post('/login', loginUser);  // Ensure this route is correctly set up
-/*router.post('/login', (req, res, next) => {
-    console.log('Login route hit!');
-    next();
-  }, loginUser);*/
+router.post('/login', loginUser);  
+router.get('/me', protect, getMe); 
 router.post('/register', registerUser);
 
 module.exports = router;
-
 
 

@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ['admin', 'seller', 'customer'], default: 'customer' },
   deleted: { type: Boolean, default: false },
+  member: { type: Boolean, default: false }, 
   resetToken: String,
   resetTokenExpiry: Date,
 }, { timestamps: true });
