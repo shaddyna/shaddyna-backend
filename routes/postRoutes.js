@@ -18,4 +18,6 @@ router.put('/:id', protect, postController.updatePost);
 // Delete a post
 router.delete('/:id', protect, postController.deletePost);
 
+router.get('/', postController.getAllPosts);
+
 module.exports = router;

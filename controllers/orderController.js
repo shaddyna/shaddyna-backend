@@ -178,8 +178,137 @@ const getUserOrders = async (req, res) => {
   }
 };
 
+const getAllOrders = async (req, res) => {
+  try {
+    //if (!req.user || req.user.role !== 'admin') {
+      //return res.status(403).json({ error: 'Only admins can access all orders' });
+    //}
+
+    const orders = await Order.find()
+      .sort({ createdAt: -1 })
+      .populate('buyerId', 'name email')
+      .populate('payments.sellerId', 'name email');
+
+    res.json({
+      success: true,
+      count: orders.length,
+      orders
+    });
+  } catch (error) {
+    console.error('Error fetching all orders:', error);
+    res.status(500).json({ error: 'Failed to fetch all orders', details: error.message });
+  }
+};
+
+const getOrdersBySeller = async (req, res) => {
+  const { sellerId } = req.params;
+
+  try {
+    // Find orders that contain at least one payment by the seller
+    const orders = await Order.find({ 'payments.sellerId': sellerId })
+      .sort({ createdAt: -1 })
+      .populate('buyerId', 'name email')
+      .populate('payments.sellerId', 'name email');
+
+    // Filter only the payments and items for that seller in each order
+    const filteredOrders = orders.map(order => {
+      const sellerPayments = order.payments.filter(payment =>
+        payment.sellerId._id.toString() === sellerId
+      );
+
+      return {
+        _id: order._id,
+        buyer: order.buyerId,
+        shipping: order.shipping,
+        status: order.status,
+        createdAt: order.createdAt,
+        totalAmount: order.totalAmount,
+        payments: sellerPayments
+      };
+    });
+
+    res.json({
+      success: true,
+      count: filteredOrders.length,
+      orders: filteredOrders
+    });
+
+  } catch (error) {
+    console.error('Error fetching seller orders:', error);
+    res.status(500).json({ error: 'Failed to fetch seller orders', details: error.message });
+  }
+};
+
+
+// ✅ Update Order (status only)
+const updateOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!['pending', 'processing', 'shipped', 'delivered', 'cancelled'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status value' });
+    }
+
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    // Only admin or seller in that order can update
+    const isAdmin = req.user.role === 'admin';
+    const isSeller = order.payments.some(p => p.sellerId.toString() === req.user.id);
+    if (!isAdmin && !isSeller) {
+      return res.status(403).json({ error: 'Unauthorized to update this order' });
+    }
+
+    order.status = status;
+    await order.save();
+
+    res.json({
+      success: true,
+      message: 'Order status updated',
+      order
+    });
+  } catch (error) {
+    console.error('Error updating order:', error);
+    res.status(500).json({ error: 'Failed to update order', details: error.message });
+  }
+};
+
+// ✅ Delete Order
+const deleteOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    // Only admin can delete orders
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Only admins can delete orders' });
+    }
+
+    await order.deleteOne();
+
+    res.json({
+      success: true,
+      message: 'Order deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting order:', error);
+    res.status(500).json({ error: 'Failed to delete order', details: error.message });
+  }
+};
+
 module.exports = {
   createOrder,
   getUserOrders,
-  getOrderDetails
+  getOrderDetails,
+  getAllOrders,
+  updateOrder,
+  deleteOrder,
+  getOrdersBySeller
 };

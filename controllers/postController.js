@@ -1,6 +1,40 @@
 const Post = require('../models/Post');
 const Shelf = require('../models/Shelf');
 
+// Get all posts (regardless of shelf)
+{/*exports.getAllPosts = async (req, res) => {
+  try {
+    const posts = await Post.find()
+      .populate('createdBy', 'name email avatar')
+      .populate('shelf', 'name bannerImage')
+      .sort({ createdAt: -1 });
+
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};*/}
+exports.getAllPosts = async (req, res) => {
+  try {
+    console.log("Fetching all posts..."); // Start log
+
+    const posts = await Post.find()
+      .populate('createdBy', 'name email avatar')
+      .populate('shelf', 'name bannerImage')
+      .sort({ createdAt: -1 });
+
+    console.log(`Successfully fetched ${posts.length} posts.`); // Success log
+
+    res.json(posts);
+  } catch (error) {
+    console.error("Error fetching posts:", error.message || error); // Failure log
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+
+
 // Create a new post
 exports.createPost = async (req, res) => {
   try {

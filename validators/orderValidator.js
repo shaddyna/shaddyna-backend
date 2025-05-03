@@ -47,5 +47,6 @@ const orderValidator = Joi.object({
 
 module.exports = {
   paymentValidator,
-  shippingValidator
+  shippingValidator,
+  orderValidator 
 };

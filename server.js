@@ -27,6 +27,8 @@ const withdrawRoutes = require('./routes/withdrawRoutes');
 const investmentRoutes = require('./routes/investmentRoutes')
 const postRoutes = require('./routes/postRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const sellerRequestRoutes = require('./routes/sellerRequestRoutes');
+
 const connectDB = require('./config/db');
 
 // Load environment variables
@@ -41,9 +43,9 @@ const io = socketIo(server, {
     origin: ["http://localhost:3000", "http://localhost:3001", "https://shaddyna-59if.onrender.com", "https://www.shaddyna.com", "https://shaddyna-frontend.onrender.com"], 
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"], 
-    credentials: true, // Allow credentials (cookies, headers, etc.)
+    credentials: true, 
   },
-  transports: ['websocket', 'polling'], // Allow both WebSocket and polling as a fallback
+  transports: ['websocket', 'polling'], 
 });
 
 // Middleware setup for CORS
@@ -124,6 +126,7 @@ app.use('/api/withdraw', withdrawRoutes)
 app.use('/api/investments', investmentRoutes) 
 app.use('/api/shellf/posts', postRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/membership', sellerRequestRoutes);
 
 // Example on the server-side
 io.on("connection", (socket) => {

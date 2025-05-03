@@ -40,6 +40,12 @@ const productSchema = new mongoose.Schema(
     category: { type: String, required: true },
     attributes: { type: mongoose.Schema.Types.Mixed, required: true }, 
     images: { type: [String], required: true },
+    sellerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Seller',
+      required: true, 
+    },
+
   },
   { timestamps: true }
 );

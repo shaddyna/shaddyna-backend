@@ -143,18 +143,20 @@ exports.createShop = async (req, res) => {
       location, 
       category, 
       attributes,
-      socialMedias
+      socialMedias,
+      sellerId
     } = req.body;
 
   // Basic validation
-if (!name || !description || !phoneNumber || !email || !location || !category) {
+if (!name || !description || !phoneNumber || !email || !location || !category || !sellerId) {
   console.error("Missing required fields:", {
     name,
     description,
     phoneNumber,
     email,
     location,
-    category
+    category,
+    sellerId
   });
 
   return res.status(400).json({ error: "Please fill all required fields" });
@@ -205,6 +207,7 @@ if (!req.files || req.files.length === 0) {
       attributes: JSON.parse(attributes),
       socialMedias: JSON.parse(socialMedias) || [],
       images: uploadedImages,
+      sellerId, 
       //owner: req.user._id // Assuming you have user authentication
     });
 
