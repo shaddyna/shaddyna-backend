@@ -14,8 +14,8 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const skillRoutes = require("./routes/skillRoutes");
 const memberRoutes = require('./routes/memberRoutes');
 const shelfRoutes = require('./routes/shelfRoutes');
-const portfolioRoutes = require('./routes/portfolioRoutes');
-const savingRoutes = require('./routes/savingRoutes');
+const portfolioRoutes = require('./routes/portfolioRoutes'); 
+const savingRoutes = require('./routes/savingRoutes'); 
 const purchaseRoutes = require('./routes/purchaseRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const seminarRoutes = require('./routes/seminarRoutes');
@@ -28,6 +28,7 @@ const investmentRoutes = require('./routes/investmentRoutes')
 const postRoutes = require('./routes/postRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const sellerRequestRoutes = require('./routes/sellerRequestRoutes');
+const membershipRoutes = require('./routes/membershipRoutes');
 
 const connectDB = require('./config/db');
 
@@ -127,6 +128,7 @@ app.use('/api/investments', investmentRoutes)
 app.use('/api/shellf/posts', postRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/membership', sellerRequestRoutes);
+app.use('/api/membership', membershipRoutes);
 
 // Example on the server-side
 io.on("connection", (socket) => {
